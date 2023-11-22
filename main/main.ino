@@ -20,10 +20,7 @@ class Header{
     int xPrintSpeed;
     int yPrintSpeed;
     int zPrintSpeed;
-    int flow;
-    int 
-    
-  
+    int flow; 
 };
 
 class Fan{
@@ -33,7 +30,7 @@ class Fan{
 
   public:
     Fan(byte pin, String pinMode){
-      pin = new Pin(pin, pinMode);
+      this->pin = new Pin(pin, pinMode);
     }
     byte getPin(){return pin->getPin();}
     void setSpeed(int speed){
