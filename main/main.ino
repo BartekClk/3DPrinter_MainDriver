@@ -12,17 +12,6 @@ class Pin{
     byte getPin(){return pin;}
 };
 
-class Header{
-  protected:
-    int xAxisPos;
-    int yAxisPos;
-    int zAxisPos;
-    int xPrintSpeed;
-    int yPrintSpeed;
-    int zPrintSpeed;
-    int flow; 
-};
-
 class Fan{
   protected:
     int speed = 0;
@@ -81,6 +70,10 @@ class HeatBed : public Heater{
 
 class HotEnd : public Heater{
   private:
+    float AxisPosition[3] = {0,0,0}; //x,y,z
+    float AxisPositionHome[3] = {0,0,0}; //x,y,z
+    bool positionTrusted = false;
+    bool levelingAfterHome = true;
   public:
     HotEnd(byte transistorPin) : Heater(transistorPin){}
 };
@@ -123,32 +116,35 @@ class Printer{
     HotEnd *hotEnd = new HotEnd(23);
     Fan *hotEndFan = new Fan(2, "OUTPUT");
     int printSpeed = 1;
+    bool absoluteExtrusion = true;
+    bool imperialUnits = false;
+    bool absolutePositioning = true;
   public:
-    Limiter *limiters[3][2] = {
+    Limiter *endStops[3][2] = {
       {}, //x dimmension
-      {}, //z dimmension
-      {}  //y dimmension
+      {}, //y dimmension
+      {}  //z dimmension
     };
 
     Printer(){
 
     }
 
-  void setLimiters(byte a[]){
-    limiters[0][0] = new Limiter(a[0], "y-front");
-    limiters[0][1] = new Limiter(a[1], "y-back");
+  void setEndStops(byte a[]){
+    endStops[0][0] = new Limiter(a[0], "y-front");
+    endStops[0][1] = new Limiter(a[1], "y-back");
 
-    limiters[1][0] = new Limiter(a[2], "x-left");
-    limiters[1][1] = new Limiter(a[3], "x-right");
+    endStops[1][0] = new Limiter(a[2], "x-left");
+    endStops[1][1] = new Limiter(a[3], "x-right");
 
-    limiters[2][0] = new Limiter(a[4], "z-top");
-    limiters[2][1] = new Limiter(a[5], "z-bottom");
+    endStops[2][0] = new Limiter(a[4], "z-top");
+    endStops[2][1] = new Limiter(a[5], "z-bottom");
   }
 
   int getBedT(bool a=0){return heatBed->getTemp(a);}
   int getHotEndT(bool a=0){return hotEnd->getTemp(a);}
   int getPrintSpeed(){return printSpeed;}
-  bool getLimiterStatus(byte row, byte collumn){return limiters[row][collumn]->getStatus();}
+  bool getendStopstatus(byte row, byte collumn){return endStops[row][collumn]->getStatus();}
 };
 
 Printer *printer = new Printer();
@@ -156,8 +152,8 @@ Printer *printer = new Printer();
 HeatBed *a = new HeatBed(22);
 
 void setup() {
-  byte limitersPins[6] = {26,27,28,29,30,31};
-  printer->setLimiters(limitersPins);
+  byte endStopsPins[6] = {26,27,28,29,30,31};
+  printer->setEndStops(endStopsPins);
   Serial.begin(9600);
 }
 
