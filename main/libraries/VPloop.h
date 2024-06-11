@@ -23,11 +23,6 @@ class Loop{
       actualTime = millis();
     }
     void action(void (*func)()){
-      // if (/* condition */)
-      // {
-      //   /* code */
-      // }
-      
       deltaTime = actualTime - lastTime;
       if (deltaTime>=time){
         func();

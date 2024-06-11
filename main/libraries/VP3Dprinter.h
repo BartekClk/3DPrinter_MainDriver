@@ -16,7 +16,7 @@
 #include "./printerComponents/heater.h"
 #include "./printerComponents/limiter.h"
 #include "./printerComponents/microSteps.h"
-#include "./printerComponents/motor.h"
+#include "./printerComponents/stepper.h"
 
 class Printer{
   public:
@@ -26,12 +26,12 @@ class Printer{
     Fan *hotEndFan = new Fan(10);
     Fan *printFan = new Fan(9);
 
-    // dir, step, enable, mmPerStep, ms
-    Motor *xMotor = new Motor(32,31,30, 0.01875, 4);
-    Motor *yMotor = new Motor(35,34,33, 0.0025, 4);
-    Motor *zMotor1 = new Motor(38,37,36, 0.005, 1);
-    Motor *zMotor2 = new Motor(41,40,39, 0.005, 1);
-    Motor *eMotor = new Motor(44,43,42, 0.01);
+    // dir, step, enable, mmPerStep
+    Stepper *xStepper = new Stepper(32,31,30, 2, 200, 1, 3, 10, 1, 2);
+    // Motor *yMotor = new Motor(35,34,33, 0.0025, 4);
+    // Motor *zMotor1 = new Motor(38,37,36, 0.005, 1);
+    // Motor *zMotor2 = new Motor(41,40,39, 0.005, 1);
+    // Motor *eMotor = new Motor(44,43,42, 0.01);
 
     MicroSteps *Ms = new MicroSteps(new byte[3]{27,28,29});
 
@@ -76,6 +76,8 @@ class Printer{
     hotEndFan->def();
     printFan->def();
     setLimiters(new byte[3]{26,27,28});
+
+    Ms->def();
   }
   void heat(){
     hotEnd->heat();

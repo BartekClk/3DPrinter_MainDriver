@@ -7,7 +7,7 @@
 
 
 class Heater{ //Class for defining heaters
-  protected:
+  public:
     int actualTemp = 10;
     int wantedTemp = 0;
     bool isHeating = 0;
@@ -58,10 +58,11 @@ class Heater{ //Class for defining heaters
   }
 
   void readTemp(){
-    actualTemp = thermistor->setAvg();
-    if (actualTemp > wantedTemp*100-200 && actualTemp < wantedTemp*100+200){
-      tempReached = 1;
-    }
+    thermistor->read();
+    // actualTemp = thermistor->setAvg();
+    // if (actualTemp > wantedTemp*100-200 && actualTemp < wantedTemp*100+200){
+    //   tempReached = 1;
+    // }
   }
 
   bool getIsHeating(){return isHeating;}

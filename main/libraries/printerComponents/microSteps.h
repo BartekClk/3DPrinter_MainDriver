@@ -38,6 +38,11 @@ class MicroSteps{
         pin[2]->setPin(0);
         break;
       case 4: // 1/16 step
+        pin[0]->setPin(0);
+        pin[1]->setPin(0);
+        pin[2]->setPin(1);
+        break;
+      case 5: // 1/32 step
         pin[0]->setPin(1);
         pin[1]->setPin(1);
         pin[2]->setPin(1);
@@ -50,7 +55,7 @@ class MicroSteps{
       }
     }
     void def(){
-      setMs(0);
+      setMs(1);
     }
 };
 

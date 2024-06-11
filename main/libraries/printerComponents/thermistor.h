@@ -1,13 +1,14 @@
 #ifndef thermistor_h
 #define thermistor_h
 
-    #include <Arduino.h>
-    #include "../VPpin.h"
-    #include "../VPBubleSort.h"
+#include <Arduino.h>
+#include <analogReadAsync.h>
+#include "../VPpin.h"
+#include "../VPBubleSort.h"
 
-    class Thermistor
+class Thermistor
     {
-    private:
+    public:
     Pin  *thermistorPin;
 
     // int thermistorSamples[10]; // Tablica przechowująca próbki
@@ -21,6 +22,8 @@
     // Parametry termistora
     float bCoef = 3950; 
 
+
+    
     float x_est = 0; // Estimated state
     double P_est = 1; // Estimated error covariance
     double Q = 0.01;  // Process noise covariance
@@ -30,41 +33,47 @@
     public:
     // Loop *loop = new Loop(100);
 
-    Thermistor(int pin, float nomRes, float bCoef, float serialRes){
+    Thermistor(uint8_t pin, float nomRes, float bCoef, float serialRes){
         this->thermistorPin = new Pin(pin, 0);
         this->nominalResistance = nomRes;
         this->bCoef = bCoef;
         this->serialResistance = serialRes;
     }
 
-    float read(){
-        int sensorValue = thermistorPin->readPinAnalog();
+    static void readCallback(uint16_t sensorValue, void* data){
+        Thermistor* thermistor = static_cast<Thermistor*>(data);
+        thermistor->processReading(sensorValue);
+    }
 
+    void read(){
+        analogReadAsync(thermistorPin->getPin(), readCallback, this);
+    }
+
+    void processReading(uint16_t sensorValue){
         // Obliczanie oporu termistora
         float resistance = serialResistance * (adcResolution / sensorValue - 1);
 
         // Obliczanie temperatury w stopniach Celsjusza
         float temperature = 1.0 / ((1.0 / 298.15) + (1.0 / bCoef) * log(resistance / nominalResistance)) - 273.15;
-
-        return temperature;
+        x_est = temperature;
     }
 
-    int setAvg(){
-        float z = read();
-        if (z > x_est-2 || z < x_est+2 || firstTemp == true){
-            firstTemp = false;
-            double x_pred = x_est;
-            double P_pred = P_est + Q;
+    // int setAvg(){
+    //     float z = read();
+    //     // if (z > x_est-2 || z < x_est+2 || firstTemp == true){
+    //         firstTemp = false;
+    //         double x_pred = x_est;
+    //         double P_pred = P_est + Q;
 
-            // Measurement update
-            double K = P_pred / (P_pred + R);
-            x_est = x_pred + K * (z - x_pred);
-            P_est = (1 - K) * P_pred;
-            return x_est*100;
-        }else{
-            return x_est*100;
-        }
-    }
+    //         // Measurement update
+    //         double K = P_pred / (P_pred + R);
+    //         x_est = x_pred + K * (z - x_pred);
+    //         P_est = (1 - K) * P_pred;
+    //         return x_est*100;
+    //     // }else{
+    //     //     return x_est*100;
+    //     // }
+    // }
     
     int getTemp(){
         return x_est;

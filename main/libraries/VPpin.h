@@ -14,11 +14,14 @@ class Pin{ //Class for defining pins
     byte pin;
     int mode; // 0 = INPUT, 1 = OUTPUT, 2 = INPUT_PULLUP
     byte defState;
+    int state;
   public:
     Pin(byte pin, int mode, byte defState=0){
       this->pin = pin;
       this->mode = mode;
       this->defState = defState;
+
+      this->defPin();
     }
 
     byte getPin(){return pin;}
@@ -56,6 +59,11 @@ class Pin{ //Class for defining pins
     void setPin(int state){
       if (state <= 1) digitalWrite(pin, state);
       else analogWrite(pin, state);
+      this->state = state; 
+    }
+
+    int getState(){
+      return state;
     }
 
     // void setPin(int state){
